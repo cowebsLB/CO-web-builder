@@ -9,6 +9,32 @@
 
 ## Layout Structure
 
+### Splash Screen Layout
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                                                          │
+│                                                          │
+│                    [Logo/Icon]                          │
+│                                                          │
+│                  CO-web-builder                         │
+│                                                          │
+│              Create websites visually                    │
+│                                                          │
+│                                                          │
+│              ┌─────────────────────┐                    │
+│              │ ████████░░░░░░░░░░░ │                    │
+│              └─────────────────────┘                    │
+│                                                          │
+│              Loading modules...                          │
+│                                                          │
+│                                                          │
+│                    Version 1.0.0                        │
+│                                                          │
+│                                                          │
+└─────────────────────────────────────────────────────────┘
+```
+
 ### Main Window Layout
 
 ```
@@ -25,6 +51,114 @@
 │  Status Bar                                             │
 └─────────────────────────────────────────────────────────┘
 ```
+
+## UI Components
+
+### 0. Splash Screen
+
+**Purpose**: Display during application startup/loading
+**Responsibilities**:
+
+- Show application branding (logo, name)
+- Display loading progress
+- Show version information
+- Provide visual feedback during initialization
+- Smooth transition to main window
+
+**Components**:
+
+- **Logo/Icon**: Application logo or icon (centered)
+- **Application Name**: "CO-web-builder" (large, prominent)
+- **Tagline**: "Create websites visually" or similar
+- **Progress Bar**: Visual progress indicator
+- **Status Text**: Current loading step (e.g., "Loading modules...", "Initializing UI...")
+- **Version Number**: Application version (bottom, subtle)
+- **Loading Animation**: Optional subtle animation (fade, pulse, etc.)
+
+**Design Specifications**:
+
+- **Size**: 600x400 pixels (or proportional)
+- **Position**: Centered on screen
+- **Background**:
+  - Light theme: White or light gray with subtle gradient
+  - Dark theme: Dark gray/black with subtle gradient
+- **Logo**: Centered, 128x128 or 256x256 pixels
+- **Typography**:
+  - Application name: Large, bold (24-32px)
+  - Tagline: Medium, regular (14-16px)
+  - Status text: Small, regular (12px)
+  - Version: Small, muted (10px)
+- **Progress Bar**:
+  - Width: 80% of window width
+  - Height: 4-6 pixels
+  - Color: Primary brand color
+  - Smooth animation
+- **Animation**:
+  - Fade in on show
+  - Fade out before closing
+  - Optional: Subtle pulse on logo
+  - Progress bar smooth fill animation
+
+**Loading Steps** (Real-time, reflects actual background operations):
+
+1. "Starting application..." (0-5%)
+   - Parse command-line arguments
+   - Check for `--no-splash` flag
+   - Initialize logging system
+
+2. "Loading configuration..." (5-15%)
+   - Load user settings from config directory
+   - Initialize configuration manager
+   - Apply user preferences
+
+3. "Initializing platform utilities..." (15-25%)
+   - Detect operating system
+   - Set up platform-specific paths
+   - Create necessary directories (if missing)
+
+4. "Loading modules..." (25-50%)
+   - Import core modules (project, element, generators)
+   - Import UI modules (main_window, toolbar, sidebar, etc.)
+   - Import utility modules (file_manager, validators, etc.)
+   - Initialize module dependencies
+
+5. "Initializing UI framework..." (50-70%)
+   - Initialize CustomTkinter
+   - Set theme (light/dark based on user preference)
+   - Create main window structure
+   - Initialize UI components
+
+6. "Loading asset manager..." (70-80%)
+   - Initialize image library
+   - Load font manager
+   - Initialize icon library
+
+7. "Checking for updates..." (80-85%)
+   - Check GitHub Releases API (if enabled)
+   - Compare versions
+   - Prepare update notification (if available)
+
+8. "Finalizing..." (85-95%)
+   - Connect UI components
+   - Initialize event handlers
+   - Load recent projects list
+   - Prepare welcome screen
+
+9. "Ready!" (95-100%)
+   - All initialization complete
+   - Main window ready to display
+
+**Behavior**:
+
+- Show immediately on application start
+- **Real-time updates**: Progress and status reflect actual background operations
+- **Accurate progress**: Progress bar reflects actual completion percentage of real tasks
+- **Dynamic status**: Status messages show what's actually happening (e.g., "Loading configuration from ~/.config/CO-web-builder/...")
+- Hide automatically when main window is ready
+- Minimum display time: 1-2 seconds (even if loading is fast)
+- Maximum display time: 10 seconds (timeout if something goes wrong)
+- Can be skipped with command-line flag: `--no-splash` (for development)
+- **Error handling**: If initialization fails, show error message on splash screen before closing
 
 ## UI Components
 

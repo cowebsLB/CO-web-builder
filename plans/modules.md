@@ -11,10 +11,96 @@
 - Manage application lifecycle
 - Coordinate between modules
 - Handle global events
+- Show splash screen during startup
+- Coordinate initialization steps
 
 **Key Classes**:
 
 - `WebBuilderApp`: Main application class
+
+### 1b. Splash Screen (`ui/splash_screen.py`)
+
+**Purpose**: Display splash screen during application startup
+**Responsibilities**:
+
+- Show splash screen window
+- Display application branding (logo, name)
+- Show loading progress
+- Update status messages during initialization
+- Handle smooth fade in/out animations
+- Coordinate with main application initialization
+
+**Key Classes**:
+
+- `SplashScreen`: Main splash screen window class
+- `LoadingProgress`: Progress bar and status text management
+
+**Key Functions**:
+
+- `show()`: Display splash screen
+- `hide()`: Hide splash screen with fade out
+- `update_progress(percentage)`: Update progress bar (0-100)
+- `update_status(message)`: Update status text
+- `set_version(version)`: Set version number to display
+- `fade_in()`: Animate fade in
+- `fade_out()`: Animate fade out
+
+**Initialization Steps** (Real-time, reflects actual operations):
+
+1. Show splash screen immediately
+2. Update progress: "Starting application..." (0-5%)
+   - Parse command-line arguments
+   - Initialize logging system
+3. Update progress: "Loading configuration..." (5-15%)
+   - Load user settings
+   - Initialize configuration manager
+4. Update progress: "Initializing platform utilities..." (15-25%)
+   - Detect OS
+   - Set up platform-specific paths
+   - Create directories
+5. Update progress: "Loading modules..." (25-50%)
+   - Import core modules (project, element, generators)
+   - Import UI modules (main_window, toolbar, sidebar, etc.)
+   - Import utility modules
+   - Initialize module dependencies
+6. Update progress: "Initializing UI framework..." (50-70%)
+   - Initialize CustomTkinter
+   - Set theme
+   - Create main window structure
+7. Update progress: "Loading asset manager..." (70-80%)
+   - Initialize image library
+   - Load font manager
+   - Initialize icon library
+8. Update progress: "Checking for updates..." (80-85%)
+   - Check GitHub Releases API (if enabled)
+   - Compare versions
+9. Update progress: "Finalizing..." (85-95%)
+   - Connect UI components
+   - Initialize event handlers
+   - Load recent projects
+10. Update progress: "Ready!" (95-100%)
+11. Fade out and show main window
+
+**Real-Time Updates**:
+
+- Each initialization step calls `splash.update_progress(percentage, status_message)`
+- Progress reflects actual completion of real tasks
+- Status messages show specific operations (e.g., "Loading configuration from ~/.config/CO-web-builder/config.json...")
+- If an operation fails, show error on splash screen before closing
+
+**Implementation Notes**:
+
+- Use CustomTkinter for consistent styling
+- **Real-time updates**: Progress and status reflect actual background operations
+- **Accurate progress**: Each initialization step reports its actual progress percentage
+- **Dynamic status**: Status messages show specific operations being performed
+- Non-blocking: Don't freeze UI during initialization
+- Thread-safe: Use `after()` for UI updates from background threads
+- **Error handling**: If initialization fails, display error message on splash before closing
+- Minimum display time: 1-2 seconds (even if loading is fast)
+- Maximum display time: 10 seconds (timeout protection)
+- Command-line flag: `--no-splash` to skip (development)
+- **Callback system**: Initialization steps call splash screen update methods as they progress
 
 ### 2. Project Management (`core/project.py`)
 
@@ -361,6 +447,7 @@
 - `hide_overlay()`: Hide overlay
 
 **Implementation Notes**:
+
 - Default: Custom implementation always enabled
 - Optional: tkinterdnd2 fallback (feature flag, user must explicitly enable)
 - Predictable behavior across all OSes
@@ -424,6 +511,42 @@
 - `ensure_directories()`: Create all necessary directories following OS conventions
 - `get_windows_special_folder(csidl)`: Get Windows special folder (Program Files, AppData, etc.)
 - `get_xdg_directory(type)`: Get XDG directory (Linux, following XDG Base Directory spec)
+
+### 16g. Update Checker (`utils/update_checker.py`)
+
+**Purpose**: Auto-update system that checks for new GitHub releases
+**Responsibilities**:
+
+- Check GitHub Releases API for new versions
+- Compare current version with latest release
+- Download updates from GitHub Releases
+- Install updates (platform-specific)
+- Handle update notifications
+- Rollback support
+
+**Key Classes**:
+
+- `UpdateChecker`: Main update checking and management
+- `UpdateDownloader`: Handle update file downloads
+- `UpdateInstaller`: Platform-specific update installation
+
+**Key Functions**:
+
+- `check_for_updates(current_version)`: Check GitHub Releases API for new version
+- `download_update(download_url, progress_callback)`: Download update file with progress tracking
+- `install_update(update_file_path)`: Install update (platform-specific)
+- `notify_update_available(version, release_notes)`: Show update notification to user
+- `get_current_version()`: Get current application version
+- `compare_versions(version1, version2)`: Compare version numbers
+
+**Implementation Notes**:
+
+- Uses GitHub Releases API: `https://api.github.com/repos/yourusername/CO-web-builder/releases/latest`
+- Only checks version number, no user data sent
+- User can disable auto-update checks in settings
+- Manual check option available
+- Non-blocking notifications
+- Keeps previous version for rollback
 
 ## Export Module
 
@@ -566,6 +689,7 @@
 - `warn_complex_css()`: Warn user about complex CSS limitations
 
 **Implementation Notes**:
+
 - **Phase 1**: Import structure only, warn about CSS limitations
 - **Phase 2**: Gradual CSS mapping, ignore complex features initially
 - Always keep backup copy of original HTML/CSS (you'll thank yourself later)
@@ -604,6 +728,7 @@
 - `debounce_sync()`: Debounce code changes (500ms wait after last change, Phase 2)
 
 **Implementation Notes**:
+
 - **Phase 1**: One-way sync only (visual → code), always reliable
 - **Phase 2**: Two-way sync with debouncing (500ms), validation, and safeguards
 - Keep visual elements immutable until code validated

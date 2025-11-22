@@ -62,7 +62,8 @@
 
 ## Additional Libraries
 
-- **requests** - Fetching external resources, API calls for deployment
+- **requests** - Fetching external resources, API calls for deployment, GitHub Releases API
+- **packaging** - Version comparison for update checking
 - **watchdog** - File system monitoring for auto-save
 - **pygments** - Syntax highlighting for code editor
 - **tinycss2** or **cssutils** - CSS parsing for import functionality
@@ -74,7 +75,7 @@
 - **fonttools** - Font file manipulation and analysis
 - **keyring** - Secure credential storage (API keys, passwords)
 - **logging** (stdlib) - Application logging
-- **threading** (stdlib) - Background operations (auto-save, file I/O)
+- **threading** (stdlib) - Background operations (auto-save, file I/O, update checking)
 - **queue** (stdlib) - Thread-safe communication
 
 ## Development Tools
@@ -142,7 +143,8 @@ watchdog>=3.0.0
 jsbeautifier>=1.14.0  # For formatting generated JS/JSX code
 cssbeautifier>=1.14.0  # For formatting generated CSS code
 pygments>=2.15.0  # Syntax highlighting for code editor
-requests>=2.31.0  # API calls, deployment, external resources, Google Fonts API
+requests>=2.31.0  # API calls, deployment, external resources, Google Fonts API, GitHub Releases API
+packaging>=23.0  # Version comparison for update checking
 paramiko>=3.3.0  # SFTP/FTP deployment
 gitpython>=3.1.0  # Git operations for GitHub Pages
 python-dotenv>=1.0.0  # Environment variables

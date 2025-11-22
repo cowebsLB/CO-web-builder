@@ -11,6 +11,7 @@ CO-web-builder/
 │   │
 │   ├── ui/                     # User interface components
 │   │   ├── __init__.py
+│   │   ├── splash_screen.py    # Splash screen (startup)
 │   │   ├── main_window.py      # Main window container
 │   │   ├── toolbar.py          # Top toolbar
 │   │   ├── sidebar.py          # Left sidebar (components/elements)
@@ -50,7 +51,8 @@ CO-web-builder/
 │   │   ├── error_handler.py    # Centralized error handling
 │   │   ├── logger.py           # Logging configuration
 │   │   ├── drag_drop.py        # Custom drag & drop implementation
-│   │   └── backup.py           # Backup and recovery
+│   │   ├── backup.py           # Backup and recovery
+│   │   └── update_checker.py   # Auto-update system (GitHub Releases)
 │   │
 │   ├── preview/                # Preview functionality
 │   │   ├── __init__.py

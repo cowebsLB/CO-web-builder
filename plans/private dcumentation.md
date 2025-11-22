@@ -32,21 +32,32 @@
    - Verify proper directory detection
    - Handle edge cases (missing directories, permissions)
 
-5. **Basic UI Framework**
+5. **Splash Screen**
+   - Create splash screen window (`ui/splash_screen.py`)
+   - Display logo and branding
+   - Implement progress bar and status text
+   - Add fade in/out animations
+   - Coordinate with application initialization
+   - Update progress during startup steps
+   - Minimum/maximum display time handling
+   - Command-line flag for skipping (`--no-splash`)
+
+6. **Basic UI Framework**
    - Set up CustomTkinter main window
    - Create basic layout (toolbar, sidebar, canvas, properties)
    - Implement window resizing
    - Basic styling/theming
    - Integrate error handling and logging
+   - Show splash screen during initialization
 
-6. **Element System Foundation**
+7. **Element System Foundation**
    - Create BaseElement class
    - Implement element data model
    - Element serialization (to dict/JSON)
    - Element deserialization (from dict/JSON)
    - Include version in serialization
 
-7. **Project Management**
+8. **Project Management**
    - Project class structure
    - Save/load project files (.coweb JSON format)
    - Project versioning (include version in file)
@@ -612,6 +623,150 @@
 - Good documentation
 - Consistent look across platforms
 
+### Splash Screen Implementation
+
+**Purpose**: Professional first impression and loading feedback
+
+**Design Approach**:
+
+- **CustomTkinter Window**: Use CustomTkinter for consistent styling with main app
+- **Non-Blocking**: Show splash immediately, initialize app in background
+- **Progress Tracking**: Update progress as initialization steps complete
+- **Smooth Animations**: Fade in/out for professional feel
+- **Minimum Display**: Show for at least 1-2 seconds (even if loading is instant)
+- **Timeout Protection**: Maximum 10 seconds (in case of issues)
+
+**Initialization Flow** (Real-time progress tracking):
+
+1. Parse command-line arguments (check for `--no-splash`)
+2. If splash enabled, show splash screen immediately
+3. Start initialization (can be in main thread or background thread)
+4. **Real-time progress updates** as each operation completes:
+   - 0-5%: "Starting application..." (parse args, init logging)
+   - 5-15%: "Loading configuration..." (load settings, init config manager)
+   - 15-25%: "Initializing platform utilities..." (detect OS, set up paths)
+   - 25-50%: "Loading modules..." (import core/UI/utility modules)
+   - 50-70%: "Initializing UI framework..." (init CustomTkinter, create window)
+   - 70-80%: "Loading asset manager..." (init image/font/icon libraries)
+   - 80-85%: "Checking for updates..." (check GitHub Releases API)
+   - 85-95%: "Finalizing..." (connect components, init handlers)
+   - 95-100%: "Ready!" (all initialization complete)
+5. Each initialization step calls `splash.update_progress(percentage, status_message)`
+6. Progress reflects actual completion of real tasks
+7. If error occurs, show error message on splash screen
+8. Wait for minimum display time (1-2 seconds) if loading was very fast
+9. Fade out splash screen
+10. Show main window
+
+**Implementation Details**:
+
+```python
+# ui/splash_screen.py
+class SplashScreen:
+    def __init__(self):
+        self.window = customtkinter.CTk()
+        self.window.title("CO-web-builder")
+        self.window.geometry("600x400")
+        self.window.resizable(False, False)
+        # Center on screen
+        # Add logo, name, progress bar, status text
+        # Set up fade animations
+        self.progress_var = customtkinter.DoubleVar(value=0.0)
+        self.status_var = customtkinter.StringVar(value="Starting...")
+    
+    def update_progress(self, percentage, status=""):
+        """Update progress bar and status text (thread-safe)"""
+        # Use after() to ensure thread-safe UI updates
+        self.window.after(0, self._update_ui, percentage, status)
+    
+    def _update_ui(self, percentage, status):
+        """Internal method to update UI (called on main thread)"""
+        self.progress_var.set(percentage)
+        if status:
+            self.status_var.set(status)
+        self.window.update_idletasks()
+    
+    def show_error(self, error_message):
+        """Display error message on splash screen"""
+        self.status_var.set(f"Error: {error_message}")
+        # Change status text color to red
+        # Optionally show error icon
+    
+    def fade_out(self, callback):
+        """Animate fade out and call callback when done"""
+        # Animate fade out
+        # Call callback when done
+
+# main.py or app.py
+def initialize_application(splash=None):
+    """Initialize application with real-time progress updates"""
+    try:
+        if splash:
+            splash.update_progress(2, "Starting application...")
+        
+        # Parse arguments, init logging
+        args = parse_arguments()
+        setup_logging()
+        
+        if splash:
+            splash.update_progress(10, "Loading configuration...")
+        
+        # Load configuration
+        config = load_configuration()
+        
+        if splash:
+            splash.update_progress(20, "Initializing platform utilities...")
+        
+        # Platform utilities
+        setup_platform_utilities()
+        
+        if splash:
+            splash.update_progress(35, "Loading modules...")
+        
+        # Import and initialize modules
+        import_core_modules()
+        import_ui_modules()
+        
+        if splash:
+            splash.update_progress(60, "Initializing UI framework...")
+        
+        # Initialize UI
+        initialize_ui_framework()
+        
+        if splash:
+            splash.update_progress(75, "Loading asset manager...")
+        
+        # Asset manager
+        initialize_asset_manager()
+        
+        if splash:
+            splash.update_progress(82, "Checking for updates...")
+        
+        # Check for updates (optional, non-blocking)
+        check_for_updates_async()
+        
+        if splash:
+            splash.update_progress(90, "Finalizing...")
+        
+        # Finalize
+        connect_components()
+        initialize_handlers()
+        
+        if splash:
+            splash.update_progress(100, "Ready!")
+        
+        return True
+    except Exception as e:
+        if splash:
+            splash.show_error(str(e))
+        raise
+```
+
+**Command-Line Flag**:
+
+- `--no-splash`: Skip splash screen (useful for development/debugging)
+- Check in `main.py` before showing splash
+
 ### Why JSON for Project Files?
 
 - Human-readable
@@ -749,10 +904,12 @@
 - **Target**: Windows 10+ (fully supported)
 - **Windows 7/8**: "Best effort" fallback only
 - **Warning**: Show warning to users on older OS:
+
   ```
   "You are running an unsupported version of Windows. 
    Some features may not work. Please upgrade to Windows 10 or later."
   ```
+
 - **Feature Flags**: Disable features that don't work on older OSes
   - Webview may fallback to external browser
   - Some registry operations may fail gracefully
@@ -764,6 +921,7 @@
 **Deadpool Tip**: For all complex features, use feature flags. Turn off fancy things (two-way sync, complex import, custom drag-drop) if platform/user can't handle it. Keeps your app alive while you tweak the hard stuff.
 
 **Feature Flags**:
+
 - `two_way_code_sync`: Phase 1: False, Phase 2: True
 - `complex_css_import`: Phase 1: False, Phase 2: True
 - `custom_drag_drop`: Always True (default)
@@ -1153,6 +1311,7 @@ elif sys.platform.startswith("linux"):
 - Plugin system
 - Cloud sync
 - AI-assisted design
+- Internationalization (i18n) - Multi-language support for app UI (deferred to later)
 
 ## Development Workflow
 
@@ -1227,6 +1386,187 @@ See `issues_and_solutions.md` for comprehensive list of identified issues and wo
 8. **Webview Fallback**: Added fallback for webview unavailability
 9. **Code Editor Sync**: Phased approach (one-way first, two-way later)
 10. **Form Submission**: Generate code with action URLs, not direct email
+
+## Update Mechanism
+
+### Auto-Update System
+
+- **Update Detection**: Check for new GitHub releases on startup (or periodic check)
+- **Update Source**: GitHub Releases API
+- **Update Process**:
+  1. Check current version vs latest GitHub release version
+  2. If update available, notify user (non-blocking notification)
+  3. User can choose to update now or later
+  4. Download update from GitHub Releases
+  5. Install update (platform-specific)
+  6. Restart application
+- **Update Frequency**: Check on startup, with option for manual check
+- **Update Notifications**: Non-intrusive notification in status bar or menu
+- **Rollback**: Keep previous version for rollback if update fails
+- **Platform-Specific**:
+  - **Windows**: Download .exe installer, run installer
+  - **macOS**: Download .dmg, mount and install
+  - **Linux**: Download AppImage/Snap/package, install via package manager
+
+### Implementation
+
+```python
+# utils/update_checker.py
+import requests
+import json
+from packaging import version
+
+def check_for_updates(current_version):
+    """Check GitHub Releases for new version"""
+    api_url = "https://api.github.com/repos/yourusername/CO-web-builder/releases/latest"
+    try:
+        response = requests.get(api_url, timeout=5)
+        latest_release = response.json()
+        latest_version = latest_release['tag_name'].lstrip('v')
+        
+        if version.parse(latest_version) > version.parse(current_version):
+            return {
+                'available': True,
+                'version': latest_version,
+                'download_url': latest_release['assets'][0]['browser_download_url'],
+                'release_notes': latest_release['body']
+            }
+    except Exception as e:
+        log_error(f"Update check failed: {e}")
+    
+    return {'available': False}
+
+def download_update(download_url, progress_callback):
+    """Download update file"""
+    # Download with progress tracking
+    pass
+
+def install_update(update_file_path):
+    """Install update (platform-specific)"""
+    # Platform-specific installation
+    pass
+```
+
+## Privacy & Data Storage
+
+### Data Storage Policy
+
+- **All Data Stored Locally**: No remote data transmission
+- **No Telemetry**: No analytics or usage tracking sent to servers
+- **No Cloud Sync**: All projects, settings, and data stored on user's machine
+- **Privacy-First**: User has complete control over their data
+- **No Data Collection**: No user data collected or transmitted
+
+### Data Locations
+
+- **Projects**: Stored in user data directory (OS-appropriate location)
+- **Settings**: Stored in config directory
+- **Cache**: Stored in cache directory
+- **Logs**: Stored in logs directory (local only)
+- **Credentials**: Stored securely in OS keychain (local only)
+- **Version History**: Stored locally in user data directory
+- **Backups**: Stored locally in user data directory
+
+### What Data is Stored
+
+#### User Data (Local Only)
+
+- **Projects**: Project files (.coweb format)
+- **Settings**: User preferences and settings
+- **Recent Projects**: List of recently opened projects
+- **Templates**: User-created templates
+- **Components**: User-created components
+- **Assets**: User-uploaded images, fonts, icons
+- **Version History**: Project version history
+- **Backups**: Automatic backups
+
+#### Application Data (Local Only)
+
+- **Configuration**: Application configuration
+- **Cache**: Preview cache, asset cache
+- **Logs**: Error logs, application logs
+- **Credentials**: API keys, deployment credentials (encrypted in OS keychain)
+
+### What Data is NOT Collected
+
+- **No Usage Analytics**: No tracking of how you use the application
+- **No Project Analytics**: No analysis of your projects
+- **No Personal Information**: No collection of personal information
+- **No Location Data**: No collection of location data
+- **No Device Information**: No collection of device information
+- **No Network Information**: No collection of network information
+
+### Update Check Privacy
+
+- **Update Check**: Only checks GitHub Releases API for version number
+- **No User Data Sent**: Update check does not send any user information
+- **No Tracking**: No tracking or analytics during update check
+- **Optional**: User can disable auto-update checks in settings
+- **Manual Check**: User can manually check for updates if auto-check disabled
+- **HTTPS Only**: All update checks use HTTPS
+
+### Error Reporting Privacy
+
+- **Local Only**: All errors logged locally only
+- **No Remote Transmission**: No error data sent to external servers
+- **User Control**: User can choose to export error logs manually
+- **No Personal Data**: Error logs don't contain personal information
+
+### Security
+
+- **API Keys**: Stored in OS keychain (Windows Credential Manager, macOS Keychain, Linux Secret Service)
+- **No Plain Text**: No credentials stored in plain text files
+- **Local Only**: All sensitive data remains on user's machine
+- **Encryption**: Credentials encrypted by OS keychain
+- **File Permissions**: Proper file permissions on user data
+
+### Privacy Policy
+
+#### Data Collection
+
+- **No Data Collection**: CO-web-builder does not collect any user data
+- **No Third-Party Services**: No third-party analytics or tracking services
+- **No Cookies**: No cookies or tracking technologies
+
+#### Data Storage
+
+- **Local Storage Only**: All data stored locally on user's machine
+- **User Control**: User has complete control over their data
+- **Data Deletion**: User can delete all data by uninstalling application
+
+#### Data Sharing
+
+- **No Data Sharing**: No data shared with third parties
+- **No Data Selling**: No data sold to third parties
+- **No Data Transmission**: No data transmitted to external servers
+
+#### User Rights
+
+- **Access**: User has full access to their data
+- **Control**: User has full control over their data
+- **Deletion**: User can delete their data at any time
+- **Export**: User can export their data at any time
+
+### Compliance
+
+- **GDPR Compliant**: Compliant with GDPR (no data collection)
+- **Privacy by Design**: Privacy built into the application
+- **Transparency**: Clear and transparent about data practices
+
+## Internationalization (i18n)
+
+### Status
+
+- **Current**: English only
+- **Future**: Multi-language support planned for later phases
+- **Deferred**: Not a priority for initial release
+
+### Future Implementation
+
+- **Translation Files**: JSON or gettext (.po) files for translations
+- **Language Selection**: Settings menu for language selection
+- **Supported Languages**: TBD (English, Spanish, French, etc.)
+- **Translation Management**: Community contributions or professional translation
 
 ## Notes
 

@@ -6,7 +6,6 @@ CO-web-builder is a powerful, cross-platform desktop application that allows you
 
 ![Platform Support](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey)
 ![Python](https://img.shields.io/badge/python-3.10+-blue)
-![License](https://img.shields.io/badge/license-MIT-green)
 
 ## ✨ Features
 
@@ -161,7 +160,7 @@ sudo pacman -S webkit2gtk
 
 ## 📁 Project Structure
 
-```
+```text
 CO-web-builder/
 ├── src/                    # Source code
 │   ├── ui/                # User interface components
@@ -236,6 +235,8 @@ See `plans/` directory for detailed architecture documentation.
 
 Comprehensive documentation is available in the `plans/` directory:
 
+### Core Documentation
+
 - **[Tech Stack](plans/techstack.md)** - Technologies and libraries used
 - **[Project Structure](plans/structure.md)** - Directory layout and organization
 - **[Modules](plans/modules.md)** - Module descriptions and responsibilities
@@ -244,6 +245,18 @@ Comprehensive documentation is available in the `plans/` directory:
 - **[Styling](plans/styling.md)** - Styling system documentation
 - **[Issues & Solutions](plans/issues_and_solutions.md)** - Known issues and workarounds
 - **[Private Documentation](plans/private%20dcumentation.md)** - Implementation notes and technical decisions
+
+### Additional Planning Documents
+
+- **[Update Mechanism](plans/update_mechanism.md)** - Auto-update system and version management
+- **[Internationalization](plans/internationalization.md)** - Multi-language support planning
+- **[Browser Compatibility](plans/browser_compatibility.md)** - Target browsers and compatibility strategy
+- **[Performance Targets](plans/performance_targets.md)** - Performance benchmarks and goals
+- **[Project File Format](plans/project_file_format.md)** - .coweb file format specification
+- **[Error Reporting](plans/error_reporting.md)** - Error and crash reporting system
+- **[Accessibility](plans/accessibility.md)** - Application accessibility features
+- **[CI/CD & Release](plans/cicd_release.md)** - Build automation and release process
+- **[Testing Strategy](plans/testing_strategy.md)** - Comprehensive testing approach
 
 ## 🐛 Known Issues & Limitations
 
@@ -290,6 +303,18 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **Jinja2** - Template engine for code generation
 - All the amazing open-source libraries that make this possible
 
+## 🔒 Privacy & Data
+
+CO-web-builder is privacy-first:
+
+- **All Data Stored Locally** - All projects, settings, and data are stored on your machine
+- **No Remote Transmission** - No data is sent to external servers
+- **No Telemetry** - No analytics or usage tracking
+- **Auto-Updates** - Checks GitHub Releases for updates (version check only, no user data sent)
+- **Secure Credentials** - API keys stored in OS keychain (Windows Credential Manager, macOS Keychain, Linux Secret Service)
+
+Your data stays yours. Always.
+
 ## 📧 Contact & Support
 
 - **Issues**: [GitHub Issues](https://github.com/yourusername/CO-web-builder/issues)
@@ -312,6 +337,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - 🔄 Import HTML/CSS/JS
 - 🔄 Asset management
 - 🔄 Auto-save & version history
+- 🔄 Auto-update system (GitHub Releases)
 
 ### Phase 3 (Planned)
 
@@ -328,9 +354,10 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - 🔮 Template marketplace
 - 🔮 Collaboration features
 - 🔮 Plugin system
+- 🔮 Internationalization (i18n) - Multi-language support
 
 ---
 
-**Made with ❤️ for web developers and designers by cowebs.lb(https://cowebslb.com)**
+**Made with ❤️ for web developers and designers by [cowebs.lb](https://cowebslb.com)**
 
 *Build beautiful websites without writing code.*

@@ -1,5 +1,31 @@
 # Core Functions & Features
 
+## Application Startup
+
+### Splash Screen
+
+- **Display on Startup**: Show splash screen during application initialization
+- **Real-Time Progress**: Visual progress bar reflecting actual background operations
+- **Dynamic Status Messages**: Display what's actually happening in real-time
+  - "Starting application..." - Parse arguments, initialize logging
+  - "Loading configuration..." - Load settings from config directory
+  - "Initializing platform utilities..." - Detect OS, set up paths
+  - "Loading modules..." - Import and initialize core/UI/utility modules
+  - "Initializing UI framework..." - Initialize CustomTkinter, create window
+  - "Loading asset manager..." - Initialize image/font/icon libraries
+  - "Checking for updates..." - Check GitHub Releases API (if enabled)
+  - "Finalizing..." - Connect components, initialize handlers
+  - "Ready!" - All initialization complete
+- **Accurate Progress Tracking**: Progress percentage reflects actual task completion
+- **Real-Time Updates**: Status and progress update as each operation completes
+- **Error Display**: Show error messages on splash if initialization fails
+- **Version Display**: Show application version number
+- **Branding**: Display logo and application name
+- **Smooth Transition**: Fade out and transition to main window
+- **Minimum Display Time**: Show for at least 1-2 seconds (even if loading is fast)
+- **Timeout Protection**: Maximum 10 seconds display time
+- **Skip Option**: Command-line flag `--no-splash` to skip (development/debugging)
+
 ## File Operations
 
 ### Project Management
